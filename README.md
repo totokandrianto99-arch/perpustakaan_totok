@@ -1,58 +1,138 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laporan Pengerjaan — Sistem Peminjaman Buku Perpustakaan
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Identitas Proyek
+- **Nama Aplikasi**: Sistem Peminjaman Buku Perpustakaan
+- **Framework**: Laravel 11
+- **Database**: MySQL (db_perpustakaan)
+- **Server**: Laragon (Apache + MySQL)
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Spesifikasi Teknis
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Stack Teknologi
+| Komponen | Teknologi |
+|----------|-----------|
+| Backend  | PHP 8.x / Laravel 11 |
+| Frontend | Blade Template + CSS Custom |
+| Database | MySQL / MariaDB |
+| Server   | Laragon (Apache) |
+| Font     | Inter (Google Fonts) |
+| Icons    | Font Awesome 6 |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Struktur Database
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Tabel `user`
+| Field      | Tipe    | Keterangan        |
+|------------|---------|-------------------|
+| id_user    | BIGINT  | Primary Key (AI)  |
+| username   | VARCHAR | Unique            |
+| password   | VARCHAR | Bcrypt hashed     |
+| level      | ENUM    | admin / petugas   |
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Tabel `buku`
+| Field        | Tipe    | Keterangan       |
+|--------------|---------|------------------|
+| id_buku      | BIGINT  | Primary Key (AI) |
+| judul        | VARCHAR | Judul buku       |
+| pengarang    | VARCHAR | Nama pengarang   |
+| tahun_terbit | YEAR    | Tahun terbit     |
+| stok         | INT     | Jumlah stok      |
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Tabel `peminjaman`
+| Field          | Tipe    | Keterangan              |
+|----------------|---------|-------------------------|
+| id_pinjam      | BIGINT  | Primary Key (AI)        |
+| nama_peminjam  | VARCHAR | Nama peminjam           |
+| tanggal_pinjam | DATE    | Tanggal pinjam          |
+| id_buku        | BIGINT  | FK → buku.id_buku       |
+| jumlah_pinjam  | INT     | Jumlah buku dipinjam    |
+| status         | ENUM    | dipinjam / dikembalikan |
 
-## Agentic Development
+---
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Fitur Aplikasi
 
-```bash
-composer require laravel/boost --dev
+### ✅ Login Admin
+- Autentikasi menggunakan username & password
+- Session-based authentication (Laravel Auth)
+- Redirect otomatis ke dashboard setelah login
 
-php artisan boost:install
+### ✅ Dashboard
+- Statistik: Total buku, total transaksi, sedang dipinjam, dikembalikan
+- Tabel buku terbaru (5 data)
+- Tabel peminjaman terbaru (5 data)
+
+### ✅ Manajemen Buku (CRUD)
+- Tambah buku baru
+- Edit data buku
+- Hapus buku
+- Tampilkan daftar buku dengan pagination
+
+### ✅ Transaksi Peminjaman
+- Input peminjaman baru (otomatis kurangi stok)
+- Konfirmasi pengembalian (otomatis tambah stok)
+- Hapus data transaksi
+- Status: dipinjam / dikembalikan
+
+---
+
+## Konfigurasi Jaringan Lokal (LAN)
+
+### Topologi: Star
+```
+[CLIENT 1] ──┐
+              ├── [SWITCH] ── [SERVER]
+[CLIENT 2] ──┘
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Pengaturan IP Address (Manual)
+| Perangkat | IP Address          | Subnet Mask   |
+|-----------|---------------------|---------------|
+| Server    | 192.168.no_absen.10 | 255.255.255.0 |
+| Client 1  | 192.168.no_absen.11 | 255.255.255.0 |
+| Client 2  | 192.168.no_absen.12 | 255.255.255.0 |
 
-## Contributing
+### Langkah Konfigurasi Server
+1. Buka **Control Panel → Network → Change adapter settings**
+2. Klik kanan adapter → Properties → IPv4
+3. Set IP: `192.168.X.10`, Subnet: `255.255.255.0`
+4. Buka Laragon → Start Apache & MySQL
+5. Buka Windows Firewall → Allow Apache (port 80)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Akses dari Client
+```
+http://192.168.X.10/perpustakaan_totok/public
+```
 
-## Code of Conduct
+### Pengujian Koneksi
+```bash
+# Dari client, ping ke server
+ping 192.168.X.10
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Jika reply → koneksi berhasil
+```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Akun Default
+| Username | Password | Level |
+|----------|----------|-------|
+| admin    | admin123 | admin |
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Cara Menjalankan
+
+```bash
+# 1. Clone / copy ke folder Laragon www
+# 2. Buat database db_perpustakaan di phpMyAdmin
+# 3. Konfigurasi .env (DB_DATABASE, DB_USERNAME, DB_PASSWORD)
+# 4. Jalankan migrasi
+php artisan migrate --seed
+
+# 5. Akses aplikasi
+http://localhost/perpustakaan_totok/public
+```
